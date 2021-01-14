@@ -1,0 +1,18 @@
+# Allow for anyone to create same environment with this docker-compose.yml config file
+# This specific work env adds the wp-content/plugins folder of WordPress install automatically
+version: "3.1"
+
+services:
+  wordpress:
+    image: wordpress
+    ports:
+      - 8888:80
+    environment:
+      WORDPRESS_DB_PASSWORD: example
+    volumes:
+      - ./:/var/www/html/wp-content/plugins/wp-js-plugin-starter
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: example
