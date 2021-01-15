@@ -1,6 +1,6 @@
 {
 	"name": "wp-lnl-recommendation-plugin",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Local News Lab recommendation module plugin for WordPress. AMP compatible.",
 	"main": "src/index.js",
 	"scripts": {
@@ -8,11 +8,7 @@
 		"build": "parcel build src/index.js"
 	},
 	"author": "Erick Martinez Jr",
-	"keywords": [
-		"wordpress",
-		"plugin",
-		"javascript"
-	],
+	"keywords": ["wordpress", "plugin", "javascript"],
 	"license": "ISC",
 	"devDependencies": {
 		"@babel/core": "^7.12.10",
