@@ -8,9 +8,15 @@
 		"build": "parcel build src/index.js"
 	},
 	"author": "Erick Martinez Jr",
-	"keywords": ["wordpress", "plugin", "javascript"],
+	"keywords": [
+		"wordpress",
+		"plugin",
+		"javascript"
+	],
 	"license": "ISC",
 	"devDependencies": {
+		"@babel/core": "^7.12.10",
+		"@wordpress/babel-preset-default": "^4.20.0",
 		"parcel-bundler": "^1.12.4"
 	}
 }

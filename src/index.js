@@ -1,1 +1,4 @@
-console.log("Start the engine!");
+
+const { createElement } = wp.element
+
+console.log(<div>Start the JSX engine!</div>)
