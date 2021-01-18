@@ -9,7 +9,11 @@
 		"package": "./bin/build-plugin-zip.sh"
 	},
 	"author": "Erick Martinez Jr",
-	"keywords": ["wordpress", "plugin", "javascript"],
+	"keywords": [
+		"wordpress",
+		"plugin",
+		"javascript"
+	],
 	"license": "ISC",
 	"devDependencies": {
 		"@babel/core": "^7.12.10",
