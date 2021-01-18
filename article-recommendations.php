@@ -34,12 +34,12 @@ function article_recommendations_register_block() {
 	}
 
 	wp_register_script(
-		'wp-js-plugin-starter',
+		'article-recommendations',
 		article_recommendations( 'dist/index.js' ),
-		array('wp-blocks','wp-element'), '1.0.1'
+		array('wp-blocks','wp-element'), '1.0.0'
 	);
-		register_block_type( 'article_recommendations/hello-world', array(
-		'editor_script' => 'article_recommendations',
+		register_block_type( 'article-recommendations/hello-world', array(
+		'editor_script' => 'article-recommendations',
 	) );
 }
 

@@ -3,7 +3,7 @@ const { createElement } = wp.element
 const { registerBlockType } = wp.blocks
 import { __ } from '@wordpress/i18n'; 
 
-registerBlockType("article_recommendations/hello-world", {
+registerBlockType("article-recommendations/hello-world", {
   title: "Hello World",
   description: "Just another Hello World block",
   icon: "admin-site",
