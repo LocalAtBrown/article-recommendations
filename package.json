@@ -1,6 +1,6 @@
 {
-	"name": "wp-lnl-recommendation-plugin",
-	"version": "1.0.1",
+	"name": "wp-article-recommendations-plugin",
+	"version": "1.0.0",
 	"description": "Local News Lab recommendation module plugin for WordPress. AMP compatible.",
 	"main": "src/index.js",
 	"scripts": {

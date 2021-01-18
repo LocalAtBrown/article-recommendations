@@ -50,12 +50,12 @@ status "Generating build..."
 npm run build
 
 # Remove any existing zip file
-rm -f wp-js-plugin-starter.zip
+rm -f article-recommendations.zip
 
 # Generate the plugin zip file
 status "Creating archive..."
-zip -r wp-js-plugin-starter.zip \
-	wp-js-plugin-starter.php \
+zip -r article-recommendations.zip \
+	article-recommendations.php \
 	dist
 
 status "Done."
