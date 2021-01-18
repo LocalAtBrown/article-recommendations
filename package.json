@@ -6,14 +6,11 @@
 	"scripts": {
 		"start": "parcel watch src/index.js",
 		"build": "parcel build src/index.js",
-		"package": "./bin/build-plugin-zip.sh"
+		"package": "./bin/build-plugin-zip.sh",
+		"docker": "docker-compose up -d"
 	},
 	"author": "Erick Martinez Jr",
-	"keywords": [
-		"wordpress",
-		"plugin",
-		"javascript"
-	],
+	"keywords": ["wordpress", "plugin", "javascript"],
 	"license": "ISC",
 	"devDependencies": {
 		"@babel/core": "^7.12.10",
