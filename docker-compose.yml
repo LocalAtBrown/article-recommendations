@@ -1,6 +1,6 @@
 # Allow for anyone to create same environment with this docker-compose.yml config file
 # This specific work env adds the wp-content/plugins folder of WordPress install automatically
-version: "3.1"
+version: '3.1'
 
 services:
   wordpress:
