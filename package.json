@@ -7,7 +7,8 @@
 		"start": "parcel watch src/index.js",
 		"build": "parcel build src/index.js",
 		"package": "./bin/build-plugin-zip.sh",
-		"docker": "docker-compose up -d"
+		"docker": "docker-compose up -d",
+		"preinstall": "npx npm-force-resolutions"
 	},
 	"author": "Erick Martinez Jr",
 	"keywords": [
@@ -28,5 +29,8 @@
 		"eslint-plugin-react": "^7.22.0",
 		"parcel-bundler": "^1.12.4",
 		"prettier": "npm:wp-prettier@^2.2.1-beta-1"
+	},
+	"resolutions": {
+		"node-forge": "0.10.0"
 	}
 }
