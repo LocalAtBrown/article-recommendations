@@ -19,6 +19,8 @@
 	"license": "ISC",
 	"devDependencies": {
 		"@babel/core": "^7.12.10",
+		"@commitlint/cli": "^11.0.0",
+		"@commitlint/config-conventional": "^11.0.0",
 		"@wordpress/babel-preset-default": "^4.20.0",
 		"@wordpress/eslint-plugin": "^7.4.0",
 		"eslint": "^7.18.0",
