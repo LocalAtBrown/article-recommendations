@@ -19,8 +19,9 @@
  *
  * @since 1.0.0
  */
-function article_recommendations( $path ) {
-	return plugins_url( $path, __FILE__ );
+function article_recommendations($path)
+{
+	return plugins_url($path, __FILE__);
 }
 
 /**
@@ -28,22 +29,24 @@ function article_recommendations( $path ) {
  *
  * @since 1.0.0
  */
-function article_recommendations_register_block() {
+function article_recommendations_register_block()
+{
 	if (!function_exists('register_block_type')) {
 		return;
 	}
 
 	wp_register_script(
 		'article-recommendations',
-		article_recommendations( 'dist/index.js' ),
-		array('wp-blocks','wp-element'), '1.0.0'
+		article_recommendations('dist/index.js'),
+		array('wp-blocks', 'wp-element'),
+		'1.0.0'
 	);
-		register_block_type( 'article-recommendations/hello-world', array(
+	register_block_type('article-recommendations/hello-world', array(
 		'editor_script' => 'article-recommendations',
-	) );
+	));
 }
 
 /**
  * Trigger the block registration on init.
  */
-add_action( 'init', 'article_recommendations_register_block' );
+add_action('init', 'article_recommendations_register_block');
