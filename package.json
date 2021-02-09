@@ -8,6 +8,7 @@
 		"build": "parcel build src/index.js",
 		"package": "./bin/build-plugin-zip.sh",
 		"docker": "docker-compose up -d",
+		"cm": "cz",
 		"preinstall": "npx npm-force-resolutions"
 	},
 	"author": "Erick Martinez Jr",
@@ -19,18 +20,34 @@
 	"license": "ISC",
 	"devDependencies": {
 		"@babel/core": "^7.12.10",
+		"@commitlint/cli": "^11.0.0",
+		"@commitlint/config-conventional": "^11.0.0",
 		"@wordpress/babel-preset-default": "^4.20.0",
 		"@wordpress/eslint-plugin": "^7.4.0",
+		"commitizen": "^4.2.3",
+		"cz-conventional-changelog": "^3.3.0",
 		"eslint": "^7.18.0",
 		"eslint-config-prettier": "^7.2.0",
 		"eslint-plugin-import": "^2.22.1",
 		"eslint-plugin-jsdoc": "^31.0.7",
 		"eslint-plugin-prettier": "^3.3.1",
 		"eslint-plugin-react": "^7.22.0",
+		"husky": "^5.0.9",
 		"parcel-bundler": "^1.12.4",
 		"prettier": "npm:wp-prettier@^2.2.1-beta-1"
 	},
 	"resolutions": {
 		"node-forge": "0.10.0"
+	},
+	"husky": {
+		"hooks": {
+			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+			"prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+		}
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
 	}
 }

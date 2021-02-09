@@ -24,5 +24,7 @@ module.exports = {
 		'react/jsx-curly-spacing': 'off',
 		// JSDoc rules overrides
 		'jsdoc/require-returns': 'off',
+		// PHP vars from backend are in snake case
+		camelcase: 'off',
 	},
 };
