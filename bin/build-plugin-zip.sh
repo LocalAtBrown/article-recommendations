@@ -31,9 +31,9 @@ if [ ! -z "$changed" ]; then
 fi
 
 branch="$(git rev-parse --abbrev-ref HEAD)"
-if [ "$branch" != 'master' ]; then
+if [ "$branch" != 'main' ]; then
 	echo "WARNING: You should probably be running this script against the"
-	echo "         'master' branch (current: '$branch')"
+	echo "         'main' branch (current: '$branch')"
 	echo
 	sleep 2
 fi
@@ -55,7 +55,7 @@ rm -f article-recommendations.zip
 # Generate the plugin zip file
 status "Creating archive..."
 zip -r article-recommendations.zip \
-	article-recommendations.php \
+	article-recommendations-widget.php \
 	dist
 
 status "Done."
