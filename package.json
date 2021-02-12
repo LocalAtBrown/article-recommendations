@@ -7,6 +7,7 @@
 		"start": "parcel watch src/index.js",
 		"build": "parcel build src/index.js",
 		"package": "./bin/build-plugin-zip.sh",
+		"cleanup": "rm -rf .cache dist",
 		"docker": "docker-compose up -d",
 		"cm": "cz",
 		"preinstall": "npx npm-force-resolutions"
