@@ -2,6 +2,10 @@
 
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
+## Development
+
+Serve the files locally with `cmd + P` and select `PHP Server: Serve project` in VS Code.
+
 ## Installing the command line tool
 
 [Commitizen](https://github.com/commitizen/cz-cli) is currently tested against
