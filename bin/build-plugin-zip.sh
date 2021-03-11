@@ -47,7 +47,7 @@ git clean -xdf
 status "Installing dependencies..."
 npm install
 status "Generating build..."
-npm run build
+parcel build src/index.js
 
 # Remove any existing zip file
 rm -f article-recommendations.zip
