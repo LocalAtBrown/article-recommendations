@@ -52,11 +52,21 @@ class article_widget extends WP_Widget
 			echo $args['before_title'] . $title . $args['after_title'];
 
 		// TODO: This could belong to an Class API
+
+		$postID = '321805'; //get_the_ID()
+		$author = get_the_author();
+
+		// live model type
+		$model_type = '&model_type=article';
+		// dev model id
+		$model_id = '&model_id=8';
+		$sort_by = '&sort_by=score';
+
 		// This is where you run the code and display the output
 		$dev_url = "https://dev-article-rec-api.localnewslab.io/recs";
-		$query = "?source_entity_id=321805&model_id=8&sort_by=score";
+		$query = "?source_entity_id=" . $postID . $model_id . $sort_by;
 		$request_url = $dev_url . $query;
-
+		// echo 'The author is: ' . $author . $postID;
 
 		// Initialize curl session
 		$curl = curl_init();
@@ -65,6 +75,7 @@ class article_widget extends WP_Widget
 
 		// Use this option is making a request to https
 		// curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false)
+
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, [
 			'Content-Type: application/json'
@@ -91,25 +102,47 @@ class article_widget extends WP_Widget
 			//The API returns data in JSON format, so first convert that to an associative array of data objects
 			$articleRecommendations = json_decode($response, true);
 
+			// Pull first article directly
+			// $recommended_article = $articleRecommendations["results"]["0"]["recommended_article"];
+
+			// $title = $recommended_article["title"];
+			// $title = str_replace(" - Washington City Paper", "", $title);
+			// $external_id = $recommended_article["external_id"];
+			// $post_url = 'https://www.washingtoncitypaper.com/article/' . $external_id;
+			// echo "<a class='widget widget_recent_entries' data-var-position=1 data-var-article-id=$external_id href=$post_url>" . $title . "</a> <br><br>";
+
+			// Recommendation schema needs to send the position and score of the article
+			// Send them in the data-var to be pulled in through AMP analytics
 			/**
-			 * Parse JSON response for 'title'
+			 * Parse JSON response for 'title'. Recursive function to extract nested JSON values
 			 *
 			 * @param [type] $json_rec
 			 * @return void
 			 */
-			function recursiveParse($json_rec)
+			function recursiveParse($json_rec, $count = 0)
 			{
 				if ($json_rec) {
 					foreach ($json_rec as $key => $value) {
 						if (is_array($value)) {
-							recursiveParse($value);
+							// echo 'array: ' . $key . '<br>';
+
+							// check if key is the iterator
+							if (is_int($key)) {
+								// start position from 1 rather than 0
+								$count = $key + 1;
+							}
+							recursiveParse($value, $count);
 						} else {
+							// echo '<br>key: ' . $json_rec . '<br>';
+							// echo  '<br>key: ' . $key . '<br>value: ' . $value;
 							if ($key == 'title') {
 								// TODO: use a regex and loop instead?
 								// Remove " - Washington City Paper" suffix from title string
 								$title = str_replace(" - Washington City Paper", "", $value);
-
-								echo "<a href='https://www.washingtoncitypaper.com'>" . $title . "</a> <br><br>";
+								$BASE_URL = 'https://www.washingtoncitypaper.com/article/';
+								$article_id = $value["external_id"];
+								$post_url = $BASE_URL . $article_id;
+								echo "<a class='widget widget_recent_entries' data-var-article-id=$article_id data-var-position=$count href=$post_url> " . $title . "</a> <br><br>";
 							}
 						}
 					}
