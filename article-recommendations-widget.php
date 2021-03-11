@@ -133,7 +133,12 @@ class article_widget extends WP_Widget
 							}
 							recursiveParse($value, $count);
 						} else {
-							// echo '<br>key: ' . $json_rec . '<br>';
+
+							// Store post id
+							if ($key == 'external_id') {
+								$article_id = $value;
+							}
+
 							// echo  '<br>key: ' . $key . '<br>value: ' . $value;
 							if ($key == 'title') {
 								// TODO: use a regex and loop instead?
@@ -141,18 +146,17 @@ class article_widget extends WP_Widget
 
 								// Remove " - Washington City Paper" suffix from title string
 								$title = str_replace(" - Washington City Paper", "", $value);
-
-								$article_id = $value["external_id"];
 								$post_url = $BASE_URL . $article_id;
 
-								echo "<a class='widget widget_recent_entries' data-var-article-id=$article_id data-var-position=$count href=$post_url> " . $title . "</a> <br><br>";
+								echo "<li><a class='widget widget_recent_entries' data-var-article-id=$article_id data-var-position=$count href=$post_url> " . $title . "</a></li>";
 							}
 						}
 					}
 				}
 			}
-
+			echo "<ul>";
 			recursiveParse($articleRecommendations);
+			echo "</ul>";
 		}
 
 		echo $args['after_widget'];
