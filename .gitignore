@@ -2,3 +2,5 @@ node_modules
 dist
 .cache
 article-recommendations.zip
+.parcel-cache
+*.js.map
