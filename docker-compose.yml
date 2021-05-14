@@ -5,6 +5,7 @@ version: '3.1'
 
 services:
   wordpress:
+    container_name: wordpress
     image: wordpress
     depends_on:
       - mysql
@@ -13,13 +14,16 @@ services:
       - 8888:80
     environment:
       WORDPRESS_DB_HOST: mysql:3306
-      WORDPRESS_DB_PASSWORD: password
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_NAME: wordpress
     volumes:
       - ./:/var/www/html/wp-content/plugins/article-recommendations
       - ../wp-content:/var/www/html/wp-content
     #   - ./path/to/my-plugin:/var/www/html/wp-content/plugins/my-plugin  // plugins to develop
 
   mysql:
+    container_name: mysql
     image: mysql:5.7
     restart: always
     environment:
