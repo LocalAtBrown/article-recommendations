@@ -30,7 +30,7 @@ class Article_Recommendations_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-
+		add_filter( 'jetpack_offline_mode', '__return_true' );
 	}
 
 }
