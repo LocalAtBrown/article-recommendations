@@ -1,52 +1,69 @@
-<!-- This file contains metadata about the WP plugin written as a PHP comment  -->
 <?php
 /**
- * Plugin Name: Article Recommendations
- * Plugin URI: https://github.com/LocalAtBrown/article-recommendations
- * Description: AMP-compatible article recommendations module
- * Author: LocalAtBrown
- * Version: 1.0.0
+ * Plugin Name:       Article Recommendations
+ * Plugin URI:        https://github.com/LocalAtBrown/article-recommendations
+ * Description:       AMP-compatible article recommendations module
+ * Author:            LocalAtBrown
+ * Author URI: 		  https://lnl.brown.columbia.edu
+ * License:           GPL-2.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Version:           1.0.0
  *
  * @package Article_Recommendations
  */
 
-/**
- * Retrieves a URL to a file in the plugin's directory.
- *
- * @param  string $path Relative path of the desired file.
- *
- * @return string       Fully qualified URL pointing to the desired file.
- *
- * @since 1.0.0
- */
-function article_recommendations($path)
-{
-	return plugins_url($path, __FILE__);
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
 }
 
 /**
- * Registers the plugin's block.
- *
- * @since 1.0.0
+ * Currently plugin version.
+ * Start at version 1.0.0 and use SemVer - https://semver.org
+ * Rename this for your plugin and update it as you release new versions.
  */
-function article_recommendations_register_block()
-{
-	if (!function_exists('register_block_type')) {
-		return;
-	}
+define( 'ARTICLE_RECOMMENDATIONS_VERSION', '1.0.0' );
 
-	wp_register_script(
-		'article-recommendations',
-		article_recommendations('dist/index.js'),
-		array('wp-blocks', 'wp-element'),
-		'1.0.0'
-	);
-	register_block_type('article-recommendations/hello-world', array(
-		'editor_script' => 'article-recommendations',
-	));
+/**
+ * The code that runs during plugin activation.
+ * This action is documented in includes/class-article-recommendations-activator.php
+ */
+function activate_article_recommendations() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-article-recommendations-activator.php';
+	Article_Recommendations_Activator::activate();
 }
 
 /**
- * Trigger the block registration on init.
+ * The code that runs during plugin deactivation.
+ * This action is documented in includes/class-article-recommendations-deactivator.php
  */
-add_action('init', 'article_recommendations_register_block');
+function deactivate_article_recommendations() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-article-recommendations-deactivator.php';
+	Article_Recommendations_Deactivator::deactivate();
+}
+
+register_activation_hook( __FILE__, 'activate_article_recommendations' );
+register_deactivation_hook( __FILE__, 'deactivate_article_recommendations' );
+
+/**
+ * The core plugin class that is used to define internationalization,
+ * admin-specific hooks, and public-facing site hooks.
+ */
+require plugin_dir_path( __FILE__ ) . 'includes/class-article-recommendations.php';
+
+/**
+ * Begins execution of the plugin.
+ *
+ * Since everything within the plugin is registered via hooks,
+ * then kicking off the plugin from this point in the file does
+ * not affect the page life cycle.
+ *
+ * @since    1.0.0
+ */
+function run_article_recommendations() {
+
+	$plugin = new Article_Recommendations();
+	$plugin->run();
+
+}
+run_article_recommendations();
