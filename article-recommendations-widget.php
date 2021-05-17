@@ -27,6 +27,47 @@ function article_register_widget() {
 	register_widget('article_widget');
 }
 
+// ----------------------------------------------------------------
+
+add_action('wp_head', 'buffer_start');
+
+/**
+ * Manipulate the page after it has been constructed, right before it is sent to visitor's browser.
+ * https://www.php.net/manual/en/function.ob-start.php
+ *
+ * Filters the entire page HTML and using regex and preg_replace(), copy each link href
+ * into a data-vars-click-url attribute.
+ * @return void
+ */
+function buffer_start()
+{
+    if (!wp_doing_ajax()) {
+	// Hold constructed HTML to give time to manipulate it.
+        ob_start('callback');
+    }
+}
+
+add_action('wp_footer', 'buffer_end');
+
+function buffer_end()
+{
+    if (!wp_doing_ajax()) {
+        ob_end_flush();
+    }
+}
+
+function callback($buffer)
+{
+    $pattern     = '/<a([^>]*?)href=["|\'](.*?)["|\']/i';
+    $replacement = '<a${1}href="${2}" data-vars-click-url="${2}"';
+
+    $buffer = preg_replace($pattern, $replacement, $buffer);
+
+    return $buffer;
+}
+
+// ----------------------------------------------------------------
+
 class article_widget extends WP_Widget {
 
 	function __construct() {
