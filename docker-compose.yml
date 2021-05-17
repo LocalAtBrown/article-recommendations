@@ -20,6 +20,7 @@ services:
     volumes:
       - ./article-recommendations:/var/www/html/wp-content/plugins/article-recommendations
       - ../wp-content:/var/www/html/wp-content
+      - ./article-recommendations-widget.php:/var/www/html/wp-content/plugins/article-recommendations-widget.php
       # See https://davidyeiser.com/tutorials/docker-wordpress-theme-setup
       - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     #   - ./path/to/my-plugin:/var/www/html/wp-content/plugins/my-plugin  // plugins to develop
