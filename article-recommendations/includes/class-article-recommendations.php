@@ -75,7 +75,7 @@ class Article_Recommendations {
 		$this->article_recommendations = 'article-recommendations';
 
 		$this->load_dependencies();
-		// $this->define_admin_hooks();
+		$this->define_admin_hooks();
 		$this->define_public_hooks();
 
 	}
@@ -106,7 +106,7 @@ class Article_Recommendations {
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		// require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-article-recommendations-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-article-recommendations-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
@@ -125,14 +125,14 @@ class Article_Recommendations {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	// private function define_admin_hooks() {
+	private function define_admin_hooks() {
 
-	// 	$plugin_admin = new Article_Recommendations_Admin( $this->get_article_recommendations(), $this->get_version() );
+		$plugin_admin = new Article_Recommendations_Admin( $this->get_article_recommendations(), $this->get_version() );
 
-	// 	$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-	// 	$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
-	// }
+	}
 
 	/**
 	 * Register all of the hooks related to the public-facing functionality
