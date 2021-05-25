@@ -123,6 +123,7 @@ class article_widget extends WP_Widget {
 
 		if( is_wp_error( $response ) ) {
 			lnl_get_recent_posts();
+			echo "</ul>";
 		}
 
 		$data = json_decode($response, true, JSON_PRETTY_PRINT);
