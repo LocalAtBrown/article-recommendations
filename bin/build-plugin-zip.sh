@@ -55,7 +55,6 @@ rm -f article-recommendations.zip
 # Generate the plugin zip file
 status "Creating archive..."
 zip -r article-recommendations.zip \
-	article-recommendations.php \
-	dist
+	article-recommendations.php
 
 status "Done."
