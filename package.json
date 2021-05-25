@@ -1,5 +1,5 @@
 {
-	"name": "wp-article-recommendations-plugin",
+	"name": "article-recommendations",
 	"version": "1.0.0",
 	"description": "Local News Lab recommendation module plugin for WordPress. AMP compatible.",
 	"main": "src/index.js",
