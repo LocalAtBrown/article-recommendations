@@ -57,6 +57,14 @@ function buffer_end()
     }
 }
 
+/**
+ * Adds data-vars-click-url attributes to anchor tags using the href value
+ * ex. <a href="www.example.com"> to
+ * <a href="www.example.com" data-vars-click-url="www.example.com">
+ *
+ * @param array|string $buffer
+ * @return array|string
+ */
 function callback($buffer)
 {
     $pattern     = '/<a([^>]*?)href=["|\'](.*?)["|\']/i';
