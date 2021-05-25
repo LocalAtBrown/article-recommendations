@@ -9,8 +9,7 @@
 		"package": "./bin/build-plugin-zip.sh",
 		"cleanup": "rm -rf .cache dist",
 		"docker": "docker-compose up -d",
-		"cm": "cz",
-		"preinstall": "npx npm-force-resolutions"
+		"cm": "cz"
 	},
 	"author": "Erick Martinez Jr",
 	"keywords": [
