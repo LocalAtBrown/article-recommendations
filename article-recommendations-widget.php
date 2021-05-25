@@ -49,6 +49,7 @@ function buffer_start()
 
 add_action('wp_footer', 'buffer_end');
 
+
 function buffer_end()
 {
     if (!wp_doing_ajax()) {
@@ -110,14 +111,14 @@ class article_widget extends WP_Widget {
 		// if title is present
 		if (!empty($title)) echo $args['before_title'] . $title . $args['after_title'];
 
-		$postID = get_the_ID(); // '321805';
+		$postID = get_the_ID();
 		$model_type = '&model_type=article';
 		$sort_by = '&sort_by=score';
 
 		// This is where you run the code and display the output
-		$dev_url = "https://dev-article-rec-api.localnewslab.io/recs";
+		$URL = "https://article-rec-api.localnewslab.io/recs";
 		$query = "?source_entity_id=" . $postID . $model_type . $sort_by;
-		$request_url = $dev_url . $query;
+		$request_url = $URL . $query;
 
 		$response = wp_remote_retrieve_body ( wp_remote_get( $request_url ) );
 
@@ -246,7 +247,7 @@ class article_widget extends WP_Widget {
 			$str .= "data-vars-three=$three ";
 			$str .= "data-vars-four=$four ";
 			$str .= "data-vars-five=$five ";
-			$str .= "data-vars-model-type='recent_posts' ";
+			$str .= "data-vars-model-type=$model_type ";
 
 			echo "<ul id='recentposts' " . $str . ">";
 
