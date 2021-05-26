@@ -120,12 +120,13 @@ class article_widget extends WP_Widget {
 		if (!empty($title)) echo $args['before_title'] . $title . $args['after_title'];
 
 		$postID = get_the_ID();
-		$model_type = '&model_type=article';
-		$sort_by = '&sort_by=score';
+		$model_type = "&model_type=article";
+		$sort_by = "&sort_by=score";
+		$exclude_param = "&exclude=$postID";
 
 		// This is where you run the code and display the output
 		$URL = "https://article-rec-api.localnewslab.io/recs";
-		$query = "?source_entity_id=" . $postID . $model_type . $sort_by;
+		$query = "?source_entity_id=" . $postID . $model_type . $sort_by . $exclude_param;
 		$request_url = $URL . $query;
 
 		$response = wp_remote_retrieve_body ( wp_remote_get( $request_url ) );
