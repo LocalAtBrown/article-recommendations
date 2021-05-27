@@ -131,15 +131,6 @@ class article_widget extends WP_Widget {
 
 		$response = wp_remote_retrieve_body ( wp_remote_get( $request_url ) );
 
-		if( is_wp_error( $response ) ) {
-			lnl_get_recent_posts();
-			echo "</ul>";
-		}
-
-		$data = json_decode($response, true, JSON_PRETTY_PRINT);
-		echo $data->results;
-		$results = $data["results"];
-
 		/**
 		 * Parse JSON response recommended articles and construct links to be rendered
 		 * Send data in the data-vars to be pulled in through AMP analytics
@@ -278,10 +269,19 @@ class article_widget extends WP_Widget {
 			}
 		}
 
-		lnl_get_recommendations($results);
-		echo "</ul>";
-		lnl_get_recent_posts();
-		echo "</ul>";
+		if( is_wp_error( $response ) ) {
+			lnl_get_recent_posts();
+			echo "</ul>";
+		}else {
+			$data = json_decode($response, true, JSON_PRETTY_PRINT);
+			echo $data->results;
+			$results = $data["results"];
+
+			lnl_get_recommendations($results);
+			echo "</ul>";
+			lnl_get_recent_posts();
+			echo "</ul>";
+		}
 
 
 		echo $args['after_widget'];
