@@ -124,6 +124,9 @@ class article_widget extends WP_Widget {
 		$sort_by = "&sort_by=score";
 		$exclude_param = "&exclude=$postID";
 
+		// TODO: Fix these article recommendations
+		$exclude_param .= ",321838,321866,244547,242808,229925,261530,244483";
+
 		// This is where you run the code and display the output
 		$URL = "https://article-rec-api.localnewslab.io/recs";
 		$query = "?source_entity_id=" . $postID . $model_type . $sort_by . $exclude_param;
@@ -190,6 +193,10 @@ class article_widget extends WP_Widget {
 					return;
 				}
 				$score = $result["score"];
+
+				if( is_nan($score) ) {
+					continue;
+				}
 
 				// Storing model object from response
 				$model =  $result["model"];
