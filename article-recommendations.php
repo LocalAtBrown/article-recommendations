@@ -17,7 +17,7 @@
  */
 
 // If this file is called directly, abort.
-if (!defined('WPINC')) {
+if ( ! defined('WPINC') ) {
 	die;
 }
 
@@ -39,9 +39,8 @@ add_action('wp_head', 'buffer_start');
  * into a data-vars-click-url attribute.
  * @return void
  */
-function buffer_start()
-{
-    if (!wp_doing_ajax()) {
+function buffer_start() {
+    if ( ! wp_doing_ajax() ) {
 	// Hold constructed HTML to give time to manipulate it.
         ob_start('callback');
     }
@@ -50,9 +49,8 @@ function buffer_start()
 add_action('wp_footer', 'buffer_end');
 
 
-function buffer_end()
-{
-    if (!wp_doing_ajax()) {
+function buffer_end() {
+    if ( ! wp_doing_ajax() ) {
         ob_end_flush();
     }
 }
@@ -65,8 +63,7 @@ function buffer_end()
  * @param array|string $buffer
  * @return array|string
  */
-function callback($buffer)
-{
+function callback($buffer) {
     $pattern     = '/<a([^>]*?)href=["|\'](.*?)["|\']/i';
     $replacement = '<a${1}href="${2}" data-vars-click-url="${2}"';
 
@@ -107,8 +104,8 @@ class article_widget extends WP_Widget {
 			// include closing tag in replace string
 			$before_widget = str_replace( '>', 'class="'. $widget_recent_entries . '">', $before_widget );
 		}
-		// there is 'class' attribute - append width value to it
 		else {
+			// there is 'class' attribute - append width value to it
 			$before_widget = str_replace( 'class="', 'class="' .$widget_recent_entries. ' ', $before_widget );
 		}
 
@@ -116,19 +113,20 @@ class article_widget extends WP_Widget {
 		echo $before_widget;
 
 		// if title is present
-		if (!empty($title)) echo $args['before_title'] . $title . $args['after_title'];
+		if ( ! empty($title) ) {
+			echo $args['before_title'] . $title . $args['after_title'];
+		}
 
 		$postID = get_the_ID();
 		$model_type = "&model_type=article";
 		$sort_by = "&sort_by=score";
-		$exclude_param = "&exclude=$postID";
-
+		$exclude = "&exclude={$postID}";
 		// TODO: Fix these article recommendations
-		#$exclude_param .= ",321838,321866,244547,242808,229925,261530,244483";
+		#$exclude .= ",321838,321866,244547,242808,229925,261530,244483";
 
 		// This is where you run the code and display the output
 		$URL = "https://article-rec-api.localnewslab.io/recs";
-		$query = "?source_entity_id={$postID}{$model_type}{$sort_by}{$exclude_param}";
+		$query = "?source_entity_id={$postID}{$model_type}{$sort_by}{$exclude}";
 		$request_url = $URL . $query;
 
 		$response = wp_remote_retrieve_body ( wp_remote_get( $request_url ) );
@@ -136,16 +134,10 @@ class article_widget extends WP_Widget {
 		$results = $data["results"];
 
 		if ( is_array( $results ) && ! is_wp_error( $results ) ) {
-    		// Work with the $result data
-    		echo $this->get_recommendations($results);
-			$this->get_recent_posts();
-			echo "</ul>";
+			echo $this->get_recommendations($results);
+			echo $this->get_recent_posts();
 		} else {
-			// Work with the error
-			$this->get_recent_posts();
-			echo "</ul>";
-			echo $args['after_widget'];
-			return;
+			echo $this->get_recent_posts();
 		}
 
 		echo $args['after_widget'];
@@ -198,47 +190,45 @@ class article_widget extends WP_Widget {
 		}
 
 		return "<ul id='recommendations' {$model_attributes} {$articles}>{$list_items}</ul>";
-	} // end of function
+	} // end of function get_recommendations
 
 	/**
 	 * Output only 5 published posts with data attributes for AMP config variable substitution
 	 *
-	 * @return void
+	 * @return string
 	 */
 	function get_recent_posts() {
-		$recent_posts = wp_get_recent_posts( array( 'numberposts' => '5', 'post_status' => 'publish' ) );
 
-		// Set the post IDs attribute
-		$str = "data-vars-one=$recent_posts[0]['ID'] ";
-		$str .= "data-vars-two=$recent_posts[1]['ID'] ";
-		$str .= "data-vars-three=$recent_posts[2]['ID'] ";
-		$str .= "data-vars-four=$recent_posts[3]['ID'] ";
-		$str .= "data-vars-five=$recent_posts[4]['ID'] ";
+		// Get 5 published recent posts
+		$args = array(
+			'numberposts' => '5',
+			'post_status' => 'publish',
+		);
+
+		$recent_posts = wp_get_recent_posts( $args );
+
 		// Set the model type attribute
-		$model_type = 'recent_posts'; // model context
-		$str .= "data-vars-model-type=$model_type ";
-
-		echo "<ul id='recentposts' " . $str . ">"; // Create the list
+		$model_type = "data-vars-model-type='recent_posts' ";
 
 		$count = 1;
+		$posts = "";
+		$list_items = "";
 		foreach ( $recent_posts as $recent_post ) {
 
-			$recent_post_id = 'recent_' . $count; // Set the IDs for links
+			$post_id = $recent_post['ID'];
+			$href = esc_url(get_permalink($post_id));
+			$post_title = apply_filters('the_title', $recent_post['post_title'], $post_id);
 
-			// Output the link
-			printf(
-				'<li><a id="%3$s" data-vars-position=%6$s data-vars-article-id=%5$s data-vars-model-type=%4$s href="%1$s">%2$s</a></li>',
-				esc_url(get_permalink($recent_post['ID'])),
-				apply_filters('the_title', $recent_post['post_title'], $recent_post['ID']),
-				$recent_post_id,
-				$model_type,
-				$recent_post['ID'],
-				$count
-			);
+			// Set the post IDs attribute
+			$posts .= "data-vars-{$count}={$post_id}";
+
+			// Create the list items for each post
+			$list_items .= "<li><a id='recent_{$count}' data-vars-position={$count} data-vars-article-id={$post_id} data-vars-model-type={$model_type} href={$href}>{$post_title}</a></li>";
 
 			$count++;
 		}
-	}
+		return "<ul id='recentposts' {$model_type} {$posts}>{$list_items}</ul>";
+	} // end of function get_recent_posts
 
 
 	/**
@@ -246,25 +236,29 @@ class article_widget extends WP_Widget {
 	 * For this example we are just allowing the widget title to be entered
 	 * */
 	public function form($instance) {
-		if (isset($instance['title'])) $title = $instance['title'];
-		else $title = __('New Title', 'article_widget_domain');
+		if ( isset( $instance['title'] ) ) {
+			$title = $instance['title'];
+		}
+		else {
+			$title = __('New Title', 'article_widget_domain');
+		}
 
 		// Widget admin form
-	?>
-<p>
-  <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
-  <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>"
-    name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
-</p>
-<?php
+		?>
+			<p>
+			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
+			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>"
+				name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
+			</p>
+		<?php
 	}
 
 	// Updating widget replacing old instances with new
-	public function update($new_instance, $old_instance) {
+	public function update( $new_instance, $old_instance ) {
 
 		$instance = array();
 
-		$instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : '';
+		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
 
 		return $instance;
 	}
