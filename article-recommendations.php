@@ -167,7 +167,7 @@ class article_widget extends WP_Widget {
 			$score = $result["score"];
 
 			// If score is NaN then continue
-			if( is_nan( $score ) ) {
+			if ( is_nan( $score ) ) {
 				continue;
 			}
 
