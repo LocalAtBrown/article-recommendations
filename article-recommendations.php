@@ -102,18 +102,15 @@ class article_widget extends WP_Widget {
 		// add widget_recent_entries class to article_recommendations widget
 		$widget_recent_entries = ! empty( $instance['widget_recent_entries'] ) ? $instance['widget_recent_entries'] : "widget_recent_entries";
 
-		// no 'class' attribute - add one with the recent_entries
-		if( strpos( $before_widget, 'class' ) === false )
-		{
+		// if no 'class' attribute - add one with the recent_entries for child theme css
+		if( strpos( $before_widget, 'class' ) === false ) {
 			// include closing tag in replace string
 			$before_widget = str_replace( '>', 'class="'. $widget_recent_entries . '">', $before_widget );
 		}
 		// there is 'class' attribute - append width value to it
-		else
-		{
-			$before_widget = str_replace( 'class="', 'class="'. $widget_recent_entries . ' ', $before_widget );
+		else {
+			$before_widget = str_replace( 'class="', 'class="' .$widget_recent_entries. ' ', $before_widget );
 		}
-
 
 		/* Before widget */
 		echo $before_widget;
@@ -131,7 +128,7 @@ class article_widget extends WP_Widget {
 
 		// This is where you run the code and display the output
 		$URL = "https://article-rec-api.localnewslab.io/recs";
-		$query = "?source_entity_id=" . $postID . $model_type . $sort_by . $exclude_param;
+		$query = "?source_entity_id={$postID}{$model_type}{$sort_by}{$exclude_param}";
 		$request_url = $URL . $query;
 
 		$response = wp_remote_retrieve_body ( wp_remote_get( $request_url ) );
@@ -140,13 +137,12 @@ class article_widget extends WP_Widget {
 
 		if ( is_array( $results ) && ! is_wp_error( $results ) ) {
     		// Work with the $result data
-    		$this->lnl_get_recommendations($results);
-			echo "</ul>";
-			$this->lnl_get_recent_posts();
+    		echo $this->get_recommendations($results);
+			$this->get_recent_posts();
 			echo "</ul>";
 		} else {
 			// Work with the error
-			$this->lnl_get_recent_posts();
+			$this->get_recent_posts();
 			echo "</ul>";
 			echo $args['after_widget'];
 			return;
@@ -159,12 +155,11 @@ class article_widget extends WP_Widget {
 	 * Parse JSON response recommended articles and construct links to be rendered
 	 * Send data in the data-vars to be pulled in through AMP analytics
 	 *
-	 * @param [type] $results
+	 * @param [array] $results - array of article recommendations from rec-api
 	 * @return string
 	 */
-	function lnl_get_recommendations($results) {
-		if( ! is_array( $results ) )
-		{
+	function get_recommendations($results) {
+		if( ! is_array( $results ) ) {
 			return;
 		}
 
@@ -210,7 +205,7 @@ class article_widget extends WP_Widget {
 	 *
 	 * @return void
 	 */
-	function lnl_get_recent_posts() {
+	function get_recent_posts() {
 		$recent_posts = wp_get_recent_posts( array( 'numberposts' => '5', 'post_status' => 'publish' ) );
 
 		// Set the post IDs attribute
