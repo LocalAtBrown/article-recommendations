@@ -118,25 +118,35 @@ class article_widget extends WP_Widget {
 		}
 
 		$postID = get_the_ID();
-		$model_type = "&model_type=article";
-		$sort_by = "&sort_by=score";
-		$exclude = "&exclude={$postID}";
+		$model_type = 'article';
+		$sort_by = 'score';
+
 		// TODO: Fix these article recommendations
+		//$exclude = "&exclude={$postID}";
 		#$exclude .= ",321838,321866,244547,242808,229925,261530,244483";
 
 		// This is where you run the code and display the output
 		$URL = "https://article-rec-api.localnewslab.io/recs";
-		$query = "?source_entity_id={$postID}{$model_type}{$sort_by}{$exclude}";
+		$query = "?source_entity_id='{$postID}'&model_type={$model_type}&sort_by={$sort_by}";
 		$request_url = $URL . $query;
 
 		$response = wp_remote_retrieve_body ( wp_remote_get( $request_url ) );
 		$data = json_decode($response, true, JSON_PRETTY_PRINT);
 		$results = $data["results"];
 
+		// Get 5 published recent posts
+		$args = array(
+			'numberposts' => '5',
+			'post_status' => 'publish',
+		);
+
+		$posts = wp_get_recent_posts( $args );
+
 		if ( is_array( $results ) && ! is_wp_error( $results ) ) {
-			echo $this->get_recommendations($results);
+			echo $this->get_recommendations( $results );
 			echo $this->get_recent_posts();
 		} else {
+			echo $this->get_recent_posts( 'recommendations' );
 			echo $this->get_recent_posts();
 		}
 
@@ -146,18 +156,46 @@ class article_widget extends WP_Widget {
 	/**
 	 * Parse JSON response recommended articles and construct links to be rendered
 	 * Send data in the data-vars to be pulled in through AMP analytics
-	 *
+	 * {
+	 * "results": [
+     *   {
+     *       "id": 36793363,
+     *       "created_at": "2021-05-26T20:32:43.997514+00:00",
+     *       "updated_at": "2021-05-26T20:32:43.997518+00:00",
+     *       "source_entity_id": "321805",
+     *       "model": {
+     *           "id": 974,
+     *           "created_at": "2021-05-26T19:51:27.569465+00:00",
+     *           "updated_at": "2021-05-26T20:33:24.491237+00:00",
+     *           "type": "article",
+     *           "status": "current"
+     *       },
+     *       "recommended_article": {
+     *           "id": 5244,
+     *           "created_at": "2021-04-16T21:58:15.521466+00:00",
+     *           "updated_at": "2021-04-16T21:58:15.521479+00:00",
+     *           "external_id": 244547,
+     *           "title": "Savage Love",
+     *           "path": "/article/229925/savage-love/",
+     *           "published_at": "2009-04-10T04:00:00+00:00"
+     *       },
+     *       "score": "NaN"
+     *   },
+	 *	..
+	 *	] }
 	 * @param [array] $results - array of article recommendations from rec-api
 	 * @return string
 	 */
-	function get_recommendations($results) {
+	function get_recommendations( $results, $id = 'recommendations' ) {
+		// If api request failed, change id to recentposts to still display posts
 		if( ! is_array( $results ) ) {
-			return;
+			return $this->get_recent_posts( $id );
 		}
 
 		$count = 1;
 		$articles = "";
 		$list_items = "";
+		$count_array = ['one','two','three','four','five'];
 		foreach ( $results as $result ) {
 			// Limit 5 posts
 			if ( $count > 5 ) {
@@ -173,23 +211,25 @@ class article_widget extends WP_Widget {
 
 			// Get model and recommended_article object from response
 			$model =  $result["model"];
-			$rec = $result["recommended_article"];
+			$post = $result["recommended_article"];
+
+ 			//$href = "href=https://www.washingtoncitypaper.com/{$rec['path']} >";
+			$post_id = $post['external_id'] ?? $post['ID'];
+			$post_title = apply_filters('the_title', $post['post_title'], $post_id);
+			$href = esc_url(get_permalink($post_id));
 
 			// Create the attributes for model and article recommendation
-			$model_attributes = "data-vars-model-id={$model['id']} data-vars-model-status={$model['status']} data-vars-model-type={$model['type']}";
-			$article_attributes = "data-vars-article-id={$rec['external_id']} data-vars-rec-id={$rec['id']} data-vars-position={$count} data-vars-score={$score}";
+			$model_attributes = "data-vars-model-id={$model['id']} data-vars-model-status={$model['status']} data-vars-model-type={$model['type']} ";
+			$article_attributes = "data-vars-article-id={$post['external_id']} data-vars-rec-id={$post['id']} data-vars-position={$count} data-vars-score={$score} ";
 
-			$articles .= "data-vars-{$count}={$rec['external_id']}";
+			$articles .= "data-vars-{$count_array[ $count - 1 ]}={$post['external_id']} ";
 
-			// Create the href
-			$class = "class='rec_article'"; // List item class
-			$href = "href=https://www.washingtoncitypaper.com/{$rec['path']} >";
-			$list_items .= "<li><a id='rec_{$count}' {$class} {$article_attributes} {$href} </a></li>";
+			$list_items .= "<li><a id='{$id}_{$count}' {$article_attributes} {$href} </a></li>";
 
 			$count++; // increase count
 		}
 
-		return "<ul id='recommendations' {$model_attributes} {$articles}>{$list_items}</ul>";
+		return "<ul id={$id} {$model_attributes} {$articles}>{$list_items}</ul>";
 	} // end of function get_recommendations
 
 	/**
@@ -197,7 +237,51 @@ class article_widget extends WP_Widget {
 	 *
 	 * @return string
 	 */
-	function get_recent_posts() {
+	function xget_recent_posts( $results, $id = 'recentposts', $hasFailed = false ) {
+
+		$count = 1;
+		$articles = "";
+		$list_items = "";
+		$count_array = ['one','two','three','four','five'];
+		foreach ( $posts as $post ) {
+			// Limit 5 posts
+			if ( $count > 5 ) {
+				return;
+			}
+
+			// I can probably made a whole default model object and use nullish coal to default the values to null.
+			// Get the score
+			$score = $post["score"] ?? 'null';
+
+			// If score is NaN then continue
+			if ( is_nan( $score ) && $score !== 'null' ) {
+				continue;
+			}
+			$post = $result["recommended_article"] ?? ;
+			$post_id = $post['external_id'] ?? $post['ID'];
+			$href = esc_url( get_permalink( $post_id ) );
+			$post_title = apply_filters( 'the_title', $post['post_title'], $post_id );
+
+			// Set the model type attribute
+			$model_attributes = "data-vars-model-id='null' data-vars-model-status='null' data-vars-model-type='recent_posts' ";
+			$article_attributes = "data-vars-article-id={$post_id} data-vars-rec-id='null' data-vars-position={$count} data-vars-score='null' ";
+
+			// Set the post IDs attribute
+			$articles .= "data-vars-{$count_array[ $count - 1 ]}={$post_id} ";
+
+			// Create the list items for each post
+			$list_items .= "<li><a id='{$id}_{$count}' {$article_attributes} {$model_attributes} href={$href} >{$post_title}</a></li>";
+
+			$count++;
+		}
+		return "<ul id={$id} {$model_attributes} {$articles} >{$list_items}</ul>";
+	} // end of function get_recent_posts
+	/**
+	 * Output only 5 published posts with data attributes for AMP config variable substitution
+	 *
+	 * @return string
+	 */
+	function get_recent_posts( $id = 'recentposts' ) {
 
 		// Get 5 published recent posts
 		$args = array(
@@ -205,29 +289,35 @@ class article_widget extends WP_Widget {
 			'post_status' => 'publish',
 		);
 
-		$recent_posts = wp_get_recent_posts( $args );
-
-		// Set the model type attribute
-		$model_type = "data-vars-model-type='recent_posts' ";
+		$posts = wp_get_recent_posts( $args );
 
 		$count = 1;
-		$posts = "";
+		$articles = "";
 		$list_items = "";
-		foreach ( $recent_posts as $recent_post ) {
+		$count_array = ['one','two','three','four','five'];
+		foreach ( $posts as $post ) {
+			// Limit 5 posts
+			if ( $count > 5 ) {
+				return;
+			}
 
-			$post_id = $recent_post['ID'];
-			$href = esc_url(get_permalink($post_id));
-			$post_title = apply_filters('the_title', $recent_post['post_title'], $post_id);
+			$post_id = $post['ID'];
+			$href = esc_url( get_permalink( $post_id ) );
+			$post_title = apply_filters( 'the_title', $post['post_title'], $post_id );
+
+			// Set the model type attribute
+			$model_attributes = "data-vars-model-id='null' data-vars-model-status='null' data-vars-model-type='recent_posts' ";
+			$article_attributes = "data-vars-article-id={$post_id} data-vars-rec-id='null' data-vars-position={$count} data-vars-score='null' ";
 
 			// Set the post IDs attribute
-			$posts .= "data-vars-{$count}={$post_id}";
+			$articles .= "data-vars-{$count_array[ $count - 1 ]}={$post_id} ";
 
 			// Create the list items for each post
-			$list_items .= "<li><a id='recent_{$count}' data-vars-position={$count} data-vars-article-id={$post_id} data-vars-model-type={$model_type} href={$href}>{$post_title}</a></li>";
+			$list_items .= "<li><a id='{$id}_{$count}' {$article_attributes} {$model_attributes} href={$href} >{$post_title}</a></li>";
 
 			$count++;
 		}
-		return "<ul id='recentposts' {$model_type} {$posts}>{$list_items}</ul>";
+		return "<ul id={$id} {$model_attributes} {$articles} >{$list_items}</ul>";
 	} // end of function get_recent_posts
 
 
