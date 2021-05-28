@@ -100,16 +100,18 @@ class article_widget extends WP_Widget {
 		$title = apply_filters('widget_title', $instance['title']);
 
 		// add widget_recent_entries class to article_recommendations widget
-		$widget_recent_entries = !empty($instance['widget_recent_entries']) ? $instance['widget_recent_entries'] : "widget_recent_entries";
+		$widget_recent_entries = ! empty( $instance['widget_recent_entries'] ) ? $instance['widget_recent_entries'] : "widget_recent_entries";
 
 		// no 'class' attribute - add one with the recent_entries
-		if( strpos($before_widget, 'class') === false ) {
+		if( strpos( $before_widget, 'class' ) === false )
+		{
 			// include closing tag in replace string
-			$before_widget = str_replace('>', 'class="'. $widget_recent_entries . '">', $before_widget);
+			$before_widget = str_replace( '>', 'class="'. $widget_recent_entries . '">', $before_widget );
 		}
 		// there is 'class' attribute - append width value to it
-		else {
-			$before_widget = str_replace('class="', 'class="'. $widget_recent_entries . ' ', $before_widget);
+		else
+		{
+			$before_widget = str_replace( 'class="', 'class="'. $widget_recent_entries . ' ', $before_widget );
 		}
 
 
@@ -125,7 +127,7 @@ class article_widget extends WP_Widget {
 		$exclude_param = "&exclude=$postID";
 
 		// TODO: Fix these article recommendations
-		$exclude_param .= ",321838,321866,244547,242808,229925,261530,244483";
+		#$exclude_param .= ",321838,321866,244547,242808,229925,261530,244483";
 
 		// This is where you run the code and display the output
 		$URL = "https://article-rec-api.localnewslab.io/recs";
@@ -133,166 +135,116 @@ class article_widget extends WP_Widget {
 		$request_url = $URL . $query;
 
 		$response = wp_remote_retrieve_body ( wp_remote_get( $request_url ) );
+		$data = json_decode($response, true, JSON_PRETTY_PRINT);
+		$results = $data["results"];
 
-		/**
-		 * Parse JSON response recommended articles and construct links to be rendered
-		 * Send data in the data-vars to be pulled in through AMP analytics
-		 * {
-		 *	"results": [
-		 *		{
-		 *			"id": 9516554,
-		 *			"created_at": "2021-05-07T14:44:54.760391+00:00",
-		 *			"updated_at": "2021-05-07T14:44:54.760393+00:00",
-		 *			"source_entity_id": "default",
-		 *			"model": {
-		 *				"id": 625,
-		 *				"created_at": "2021-05-07T14:44:54.754762+00:00",
-		 *				"updated_at": "2021-05-07T14:44:54.852580+00:00",
-		 *				"type": "popularity",
-		 *				"status": "current"
-		 *			},
-		 *			"recommended_article": {
-		 *				"id": 4550,
-		 *				"created_at": "2021-04-15T00:20:21.728914+00:00",
-		 *				"updated_at": "2021-04-15T00:20:21.728927+00:00",
-		 *				"external_id": 286326,
-		 *				"title": "Lost Highway",
-		 *				"path": "/article/286326/lost-highway/",
-		 *				"published_at": "1996-09-27T04:00:00+00:00"
-		 *			},
-		 *			"score": "0.888446"
-		 *		}
-		 *	]
-		 * }
-		 * @param [type] $results
-		 * @return void
-		 */
-		function lnl_get_recommendations($results) {
-			$id = $results[0]['model']['id'];
-			$type = $results[0]['model']['type'];
-			$status = $results[0]['model']['status'];
-			$one = $results[0]['recommended_article']['external_id'];
-			$two=$results[1]['recommended_article']['external_id'];
-			$three=$results[2]['recommended_article']['external_id'];
-			$four=$results[3]['recommended_article']['external_id'];
-			$five=$results[4]['recommended_article']['external_id'];
-			$str = "data-vars-model-id=$id ";
-			$str .= "data-vars-model-status=$status ";
-			$str .= "data-vars-model-type=$type ";
-			$str .= "data-vars-one=$one ";
-			$str .= "data-vars-two=$two ";
-			$str .= "data-vars-three=$three ";
-			$str .= "data-vars-four=$four ";
-			$str .= "data-vars-five=$five ";
-
-			echo "<ul id='recommendations' " . $str . ">";
-
-			$count = 1;
-			foreach ($results as $result) {
-				if ($count > 5) {
-					return;
-				}
-				$score = $result["score"];
-
-				if( is_nan($score) ) {
-					continue;
-				}
-
-				// Storing model object from response
-				$model =  $result["model"];
-				$model_id =  $model["id"];
-				$model_status = $model["status"];
-				$model_type = $model["type"];
-
-				// Store recommendation_article object from response
-				$rec = $result["recommended_article"];
-
-				$BASE_URL = 'https://www.washingtoncitypaper.com';
-				$rec_id = $rec["id"];
-				$article_title = esc_html($rec["title"]);
-				$article_path = $rec["path"];
-				$article_id = $rec["external_id"];
-				$post_url = $BASE_URL . $article_path;
-
-				// Construct the link
-				$str = "data-vars-model-id=$model_id ";
-				$str .= "data-vars-model-type='$model_type' ";
-				$str .= "data-vars-model-status='$model_status' ";
-				$str .= "data-vars-article-id=$article_id ";
-				$str .= "data-vars-rec-id=$rec_id ";
-				$str .= "data-vars-position=$count ";
-				$str .= "data-vars-article-title='$article_title' ";
-				$str .= "data-vars-score=$score ";
-				$str .= "href=$post_url>";
-				$str .= $article_title;
-
-				$recId = 'rec_' . $count;
-				echo "<li><a id=$recId class='rec_article' " . $str . "</a></li>";
-
-				$count++;
-			}
-		}
-
-		/**
-		 * Output recent posts
-		 *
-		 * @return void
-		 */
-		function lnl_get_recent_posts() {
-
-			$args = array( 'numberposts' => '5' );
-			$recent_posts = wp_get_recent_posts($args);
-			$model_type = 'recent_posts'; // model context
-
-			$one = $recent_posts[0]['ID'];
-			$two=$recent_posts[1]['ID'];
-			$three=$recent_posts[2]['ID'];
-			$four=$recent_posts[3]['ID'];
-			$five=$recent_posts[4]['ID'];
-			$str = "data-vars-one=$one ";
-			$str .= "data-vars-two=$two ";
-			$str .= "data-vars-three=$three ";
-			$str .= "data-vars-four=$four ";
-			$str .= "data-vars-five=$five ";
-			$str .= "data-vars-model-type=$model_type ";
-
-			echo "<ul id='recentposts' " . $str . ">";
-
-			$count = 1;
-			foreach ($recent_posts as $recent) {
-				$recent_post_id = 'recent_' . $count;
-
-				printf(
-					'<li><a id="%3$s" data-vars-position=%6$s data-vars-article-id=%5$s data-vars-model-type=%4$s href="%1$s">%2$s</a></li>',
-					esc_url(get_permalink($recent['ID'])),
-					apply_filters('the_title', $recent['post_title'], $recent['ID']),
-					$recent_post_id,
-					$model_type,
-					$recent['ID'],
-					$count
-				);
-
-				$count++;
-			}
-		}
-
-		if( is_wp_error( $response ) ) {
-			lnl_get_recent_posts();
+		if ( is_array( $results ) && ! is_wp_error( $results ) ) {
+    		// Work with the $result data
+    		$this->lnl_get_recommendations($results);
 			echo "</ul>";
-		}else {
-			$data = json_decode($response, true, JSON_PRETTY_PRINT);
-			echo $data->results;
-			$results = $data["results"];
-
-			lnl_get_recommendations($results);
+			$this->lnl_get_recent_posts();
 			echo "</ul>";
-			lnl_get_recent_posts();
+		} else {
+			// Work with the error
+			$this->lnl_get_recent_posts();
 			echo "</ul>";
+			echo $args['after_widget'];
+			return;
 		}
-
 
 		echo $args['after_widget'];
 	} // end public function widget
+
+	/**
+	 * Parse JSON response recommended articles and construct links to be rendered
+	 * Send data in the data-vars to be pulled in through AMP analytics
+	 *
+	 * @param [type] $results
+	 * @return string
+	 */
+	function lnl_get_recommendations($results) {
+		if( ! is_array( $results ) )
+		{
+			return;
+		}
+
+		$count = 1;
+		$articles = "";
+		$list_items = "";
+		foreach ( $results as $result ) {
+			// Limit 5 posts
+			if ( $count > 5 ) {
+				return;
+			}
+
+			$score = $result["score"];
+
+			// If score is NaN then continue
+			if( is_nan( $score ) ) {
+				continue;
+			}
+
+			// Get model and recommended_article object from response
+			$model =  $result["model"];
+			$rec = $result["recommended_article"];
+
+			// Create the attributes for model and article recommendation
+			$model_attributes = "data-vars-model-id={$model['id']} data-vars-model-status={$model['status']} data-vars-model-type={$model['type']}";
+			$article_attributes = "data-vars-article-id={$rec['external_id']} data-vars-rec-id={$rec['id']} data-vars-position={$count} data-vars-score={$score}";
+
+			$articles .= "data-vars-{$count}={$rec['external_id']}";
+
+			// Create the href
+			$class = "class='rec_article'"; // List item class
+			$href = "href=https://www.washingtoncitypaper.com/{$rec['path']} >";
+			$list_items .= "<li><a id='rec_{$count}' {$class} {$article_attributes} {$href} </a></li>";
+
+			$count++; // increase count
+		}
+
+		return "<ul id='recommendations' {$model_attributes} {$articles}>{$list_items}</ul>";
+	} // end of function
+
+	/**
+	 * Output only 5 published posts with data attributes for AMP config variable substitution
+	 *
+	 * @return void
+	 */
+	function lnl_get_recent_posts() {
+		$recent_posts = wp_get_recent_posts( array( 'numberposts' => '5', 'post_status' => 'publish' ) );
+
+		// Set the post IDs attribute
+		$str = "data-vars-one=$recent_posts[0]['ID'] ";
+		$str .= "data-vars-two=$recent_posts[1]['ID'] ";
+		$str .= "data-vars-three=$recent_posts[2]['ID'] ";
+		$str .= "data-vars-four=$recent_posts[3]['ID'] ";
+		$str .= "data-vars-five=$recent_posts[4]['ID'] ";
+		// Set the model type attribute
+		$model_type = 'recent_posts'; // model context
+		$str .= "data-vars-model-type=$model_type ";
+
+		echo "<ul id='recentposts' " . $str . ">"; // Create the list
+
+		$count = 1;
+		foreach ( $recent_posts as $recent_post ) {
+
+			$recent_post_id = 'recent_' . $count; // Set the IDs for links
+
+			// Output the link
+			printf(
+				'<li><a id="%3$s" data-vars-position=%6$s data-vars-article-id=%5$s data-vars-model-type=%4$s href="%1$s">%2$s</a></li>',
+				esc_url(get_permalink($recent_post['ID'])),
+				apply_filters('the_title', $recent_post['post_title'], $recent_post['ID']),
+				$recent_post_id,
+				$model_type,
+				$recent_post['ID'],
+				$count
+			);
+
+			$count++;
+		}
+	}
+
 
 	/**
 	 * Widget Backend - this controls what you see in the Widget UI
