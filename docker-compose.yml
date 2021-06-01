@@ -24,7 +24,7 @@ services:
     ports:
       - 8888:80
     volumes:
-      - ./wp-content:/var/www/html/wp-content
+      - ../wp-content:/var/www/html/wp-content
       - ./:/var/www/html/wp-content/plugins/article-recommendations
     #   - ./path/to/my-plugin:/var/www/html/wp-content/plugins/my-plugin  // plugins to develop
     environment:
