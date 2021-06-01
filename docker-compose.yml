@@ -4,20 +4,6 @@
 version: '3.1'
 
 services:
-  wordpress:
-    image: wordpress
-    depends_on:
-      - mysql
-    restart: always
-    ports:
-      - 8888:80
-    environment:
-      WORDPRESS_DB_HOST: mysql:3306
-      WORDPRESS_DB_PASSWORD: password
-    volumes:
-      - ./:/var/www/html/wp-content/plugins/article-recommendations
-    #   - ./path/to/my-plugin:/var/www/html/wp-content/plugins/my-plugin  // plugins to develop
-
   mysql:
     image: mysql:5.7
     restart: always
@@ -27,8 +13,24 @@ services:
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
     volumes:
-    #   - wordpress:/var/www/html // specific themes
+      #   - wordpress:/var/www/html // specific themes
       - db_data:/var/lib/mysql
 
+  wordpress:
+    image: wordpress:latest
+    depends_on:
+      - mysql
+    restart: always
+    ports:
+      - 8888:80
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+      - ./:/var/www/html/wp-content/plugins/article-recommendations
+    #   - ./path/to/my-plugin:/var/www/html/wp-content/plugins/my-plugin  // plugins to develop
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
 volumes:
   db_data: {}
