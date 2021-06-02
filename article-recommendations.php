@@ -218,7 +218,8 @@ class article_widget extends WP_Widget {
 
 			// If permalink returns false, no post found. Then use wcp link.
 			if( ! get_permalink( $post_id ) ) {
-				$href = esc_url( "https://www.washingtoncitypaper.com{$post['path']}" );
+				$url = esc_url (  "https://www.washingtoncitypaper.com{$post['path']}" );
+				$href = "href={$url}";
 			} else {
 				$href = esc_url( get_permalink( $post_id ) );
 			}
