@@ -127,7 +127,7 @@ class article_widget extends WP_Widget {
 
 		// This is where you run the code and display the output
 		$URL = "https://article-rec-api.localnewslab.io/recs";
-		$query = "?source_entity_id='{$post_id}'&model_type={$model_type}&sort_by={$sort_by}{$exclude}";
+		$query = "?source_entity_id={$post_id}&model_type={$model_type}&sort_by={$sort_by}{$exclude}";
 		$request_url = $URL . $query;
 
 		$response = wp_remote_retrieve_body ( wp_remote_get( $request_url ) );
