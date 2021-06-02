@@ -117,30 +117,22 @@ class article_widget extends WP_Widget {
 			echo $args['before_title'] . $title . $args['after_title'];
 		}
 
-		$postID = get_the_ID();
+		$post_id = get_the_ID();
 		$model_type = 'article';
 		$sort_by = 'score';
+		$exclude = "&exclude={$post_id}";
 
 		// TODO: Fix these article recommendations
-		//$exclude = "&exclude={$postID}";
 		#$exclude .= ",321838,321866,244547,242808,229925,261530,244483";
 
 		// This is where you run the code and display the output
 		$URL = "https://article-rec-api.localnewslab.io/recs";
-		$query = "?source_entity_id='{$postID}'&model_type={$model_type}&sort_by={$sort_by}";
+		$query = "?source_entity_id='{$post_id}'&model_type={$model_type}&sort_by={$sort_by}{$exclude}";
 		$request_url = $URL . $query;
 
 		$response = wp_remote_retrieve_body ( wp_remote_get( $request_url ) );
 		$data = json_decode($response, true, JSON_PRETTY_PRINT);
 		$results = $data["results"];
-
-		// Get 5 published recent posts
-		$args = array(
-			'numberposts' => '5',
-			'post_status' => 'publish',
-		);
-
-		$posts = wp_get_recent_posts( $args );
 
 		if ( is_array( $results ) && ! is_wp_error( $results ) ) {
 			echo $this->get_recommendations( $results );
@@ -202,10 +194,11 @@ class article_widget extends WP_Widget {
 				return;
 			}
 
+			// Get score from result (Rec API)
 			$score = $result["score"];
 
 			// If score is NaN then continue
-			if ( is_nan( $score ) ) {
+			if ( is_nan( $score ) || $score === 0 ) {
 				continue;
 			}
 
@@ -214,8 +207,9 @@ class article_widget extends WP_Widget {
 			$post = $result["recommended_article"];
 
  			//$href = "href=https://www.washingtoncitypaper.com/{$rec['path']} >";
-			$post_id = $post['external_id'] ?? $post['ID'];
-			$post_title = apply_filters('the_title', $post['post_title'], $post_id);
+			$post_id = $post['external_id'] ?? $post['ID']; // If Rec API result, get the 'external_id' else set to WP 'ID'
+			$title = $post['title'] ?? $post['post_title']; // If Rec API result, get the 'title' else set to WP 'post_title'
+			$post_title = apply_filters('the_title', $title, $post_id); // Display the post_title
 			$href = esc_url(get_permalink($post_id));
 
 			// Create the attributes for model and article recommendation
@@ -224,7 +218,7 @@ class article_widget extends WP_Widget {
 
 			$articles .= "data-vars-{$count_array[ $count - 1 ]}={$post['external_id']} ";
 
-			$list_items .= "<li><a id='{$id}_{$count}' {$article_attributes} {$href} </a></li>";
+			$list_items .= "<li><a id='{$id}_{$count}' {$article_attributes} {$href} </a>{$post_title}</li>";
 
 			$count++; // increase count
 		}
@@ -232,50 +226,6 @@ class article_widget extends WP_Widget {
 		return "<ul id={$id} {$model_attributes} {$articles}>{$list_items}</ul>";
 	} // end of function get_recommendations
 
-	/**
-	 * Output only 5 published posts with data attributes for AMP config variable substitution
-	 *
-	 * @return string
-	 */
-	function xget_recent_posts( $results, $id = 'recentposts', $hasFailed = false ) {
-
-		$count = 1;
-		$articles = "";
-		$list_items = "";
-		$count_array = ['one','two','three','four','five'];
-		foreach ( $posts as $post ) {
-			// Limit 5 posts
-			if ( $count > 5 ) {
-				return;
-			}
-
-			// I can probably made a whole default model object and use nullish coal to default the values to null.
-			// Get the score
-			$score = $post["score"] ?? 'null';
-
-			// If score is NaN then continue
-			if ( is_nan( $score ) && $score !== 'null' ) {
-				continue;
-			}
-			$post = $result["recommended_article"] ?? ;
-			$post_id = $post['external_id'] ?? $post['ID'];
-			$href = esc_url( get_permalink( $post_id ) );
-			$post_title = apply_filters( 'the_title', $post['post_title'], $post_id );
-
-			// Set the model type attribute
-			$model_attributes = "data-vars-model-id='null' data-vars-model-status='null' data-vars-model-type='recent_posts' ";
-			$article_attributes = "data-vars-article-id={$post_id} data-vars-rec-id='null' data-vars-position={$count} data-vars-score='null' ";
-
-			// Set the post IDs attribute
-			$articles .= "data-vars-{$count_array[ $count - 1 ]}={$post_id} ";
-
-			// Create the list items for each post
-			$list_items .= "<li><a id='{$id}_{$count}' {$article_attributes} {$model_attributes} href={$href} >{$post_title}</a></li>";
-
-			$count++;
-		}
-		return "<ul id={$id} {$model_attributes} {$articles} >{$list_items}</ul>";
-	} // end of function get_recent_posts
 	/**
 	 * Output only 5 published posts with data attributes for AMP config variable substitution
 	 *
@@ -301,13 +251,27 @@ class article_widget extends WP_Widget {
 				return;
 			}
 
-			$post_id = $post['ID'];
+			// I can probably made a whole default model object and use nullish coal to default the values to null.
+			// Get the score
+			$score = $post["score"] ?? 0;
+
+			// If score is NaN then continue
+			if ( is_nan( $score ) && $score !== 'null') {
+				continue;
+			}
+
+			$post = $post["recommended_article"] ?? $post;
+			$post_id = $post['external_id'] ?? $post['ID'];
+			$rec_id = $post['id'] ?? 0;
+
 			$href = esc_url( get_permalink( $post_id ) );
-			$post_title = apply_filters( 'the_title', $post['post_title'], $post_id );
+
+			$title = $post['title'] ?? $post['post_title']; // If Rec API result, get the 'title' else set to WP 'post_title'
+			$post_title = apply_filters('the_title', $title, $post_id); // Display the post_title
 
 			// Set the model type attribute
 			$model_attributes = "data-vars-model-id='null' data-vars-model-status='null' data-vars-model-type='recent_posts' ";
-			$article_attributes = "data-vars-article-id={$post_id} data-vars-rec-id='null' data-vars-position={$count} data-vars-score='null' ";
+			$article_attributes = "data-vars-article-id={$post_id} data-vars-rec-id={$rec_id} data-vars-position={$count} data-vars-score={$score} ";
 
 			// Set the post IDs attribute
 			$articles .= "data-vars-{$count_array[ $count - 1 ]}={$post_id} ";
@@ -319,7 +283,6 @@ class article_widget extends WP_Widget {
 		}
 		return "<ul id={$id} {$model_attributes} {$articles} >{$list_items}</ul>";
 	} // end of function get_recent_posts
-
 
 	/**
 	 * Widget Backend - this controls what you see in the Widget UI
@@ -335,12 +298,12 @@ class article_widget extends WP_Widget {
 
 		// Widget admin form
 		?>
-			<p>
-			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
-			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>"
-				name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
-			</p>
-		<?php
+<p>
+  <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
+  <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>"
+    name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
+</p>
+<?php
 	}
 
 	// Updating widget replacing old instances with new
