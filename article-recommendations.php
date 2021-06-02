@@ -230,7 +230,7 @@ class article_widget extends WP_Widget {
 			$articles .= "data-vars-{$count_array[ $count - 1 ]}={$post['external_id']} ";
 
 			// Add list item to string builder
-			$list_items .= "<li><a id='{$id}_{$count}' {$article_attributes} {$href} </a>{$post_title}</li>";
+			$list_items .= "<li><a id='{$id}_{$count}' {$model_attributes} {$article_attributes} {$href} </a>{$post_title}</li>";
 
 			$count++; // increase count
 		}
