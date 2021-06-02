@@ -187,11 +187,12 @@ class article_widget extends WP_Widget {
 		$count = 1;
 		$articles = "";
 		$list_items = "";
+		$model_attributes = "";
 		$count_array = ['one','two','three','four','five'];
 		foreach ( $results as $result ) {
 			// Limit 5 posts
 			if ( $count > 5 ) {
-				return;
+				break;
 			}
 
 			// Get score from result (Rec API)
@@ -206,18 +207,28 @@ class article_widget extends WP_Widget {
 			$model =  $result["model"];
 			$post = $result["recommended_article"];
 
- 			//$href = "href=https://www.washingtoncitypaper.com/{$rec['path']} >";
-			$post_id = $post['external_id'] ?? $post['ID']; // If Rec API result, get the 'external_id' else set to WP 'ID'
-			$title = $post['title'] ?? $post['post_title']; // If Rec API result, get the 'title' else set to WP 'post_title'
-			$post_title = apply_filters('the_title', $title, $post_id); // Display the post_title
-			$href = esc_url(get_permalink($post_id));
+			// If Rec API result, get the 'external_id' else set to WP 'ID'
+			$post_id = $post['external_id'] ?? $post['ID'];
+
+			// If Rec API result, get the 'title' else set to WP 'post_title'
+			$title = $post['title'] ?? $post['post_title'];
+
+			// Display the post_title
+			$post_title = apply_filters('the_title', $title, $post_id);
+
+			// If permalink returns false, no post found. Then use wcp link.
+			if( ! get_permalink( $post_id ) ) {
+				$href = esc_url( "https://www.washingtoncitypaper.com{$post['path']}" );
+			} else {
+				$href = esc_url( get_permalink( $post_id ) );
+			}
 
 			// Create the attributes for model and article recommendation
 			$model_attributes = "data-vars-model-id={$model['id']} data-vars-model-status={$model['status']} data-vars-model-type={$model['type']} ";
 			$article_attributes = "data-vars-article-id={$post['external_id']} data-vars-rec-id={$post['id']} data-vars-position={$count} data-vars-score={$score} ";
-
 			$articles .= "data-vars-{$count_array[ $count - 1 ]}={$post['external_id']} ";
 
+			// Add list item to string builder
 			$list_items .= "<li><a id='{$id}_{$count}' {$article_attributes} {$href} </a>{$post_title}</li>";
 
 			$count++; // increase count
@@ -248,7 +259,7 @@ class article_widget extends WP_Widget {
 		foreach ( $posts as $post ) {
 			// Limit 5 posts
 			if ( $count > 5 ) {
-				return;
+				break;
 			}
 
 			// I can probably made a whole default model object and use nullish coal to default the values to null.
@@ -281,6 +292,7 @@ class article_widget extends WP_Widget {
 
 			$count++;
 		}
+
 		return "<ul id={$id} {$model_attributes} {$articles} >{$list_items}</ul>";
 	} // end of function get_recent_posts
 
