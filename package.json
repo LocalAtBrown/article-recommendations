@@ -1,5 +1,5 @@
 {
-	"name": "wp-article-recommendations-plugin",
+	"name": "article-recommendations",
 	"version": "1.0.0",
 	"description": "Local News Lab recommendation module plugin for WordPress. AMP compatible.",
 	"main": "src/index.js",
@@ -9,8 +9,7 @@
 		"package": "./bin/build-plugin-zip.sh",
 		"cleanup": "rm -rf .cache dist",
 		"docker": "docker-compose up -d",
-		"cm": "cz",
-		"preinstall": "npx npm-force-resolutions"
+		"cm": "cz"
 	},
 	"author": "Erick Martinez Jr",
 	"keywords": [

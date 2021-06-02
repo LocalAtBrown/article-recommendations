@@ -47,7 +47,7 @@ git clean -xdf
 status "Installing dependencies..."
 npm install
 status "Generating build..."
-parcel build src/index.js
+# parcel build src/index.js - this step is for gutenberg blocks
 
 # Remove any existing zip file
 rm -f article-recommendations.zip
@@ -55,7 +55,6 @@ rm -f article-recommendations.zip
 # Generate the plugin zip file
 status "Creating archive..."
 zip -r article-recommendations.zip \
-	article-recommendations-widget.php \
-	dist
+	article-recommendations.php
 
 status "Done."
