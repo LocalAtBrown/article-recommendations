@@ -217,8 +217,11 @@ class article_widget extends WP_Widget {
 			$post_title = apply_filters('the_title', $title, $post_id);
 
 			// If permalink returns false, no post found. Then use wcp link.
-			$href = esc_url( get_permalink( $post_id ) ?? "https://www.washingtoncitypaper.com{$post['path']}" );
+			$href = "https://www.washingtoncitypaper.com{$post['path']}";
 
+			if( get_permalink( $post_id ) ){
+				$href = esc_url( get_permalink( $post_id ) );
+			};
 
 			// Create the attributes for model and article recommendation
 			$model_attributes = "data-vars-model-id={$model['id']} data-vars-model-status={$model['status']} data-vars-model-type={$model['type']} ";
@@ -226,7 +229,7 @@ class article_widget extends WP_Widget {
 			$articles .= "data-vars-{$count_array[ $count - 1 ]}={$post['external_id']} ";
 
 			// Add list item to string builder
-			$list_items .= "<li><a id='{$id}_{$count}' {$model_attributes} {$article_attributes} href={$href} </a>{$post_title}</li>";
+			$list_items .= "<li><a id='{$id}_{$count}' {$model_attributes} {$article_attributes} href={$href} >{$post_title}</a></li>";
 
 			$count++; // increase count
 		}
