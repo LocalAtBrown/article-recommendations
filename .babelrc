@@ -1,3 +1,9 @@
 {
-  "presets": ["@wordpress/default"]
+	"presets": [
+		"@babel/preset-env",
+		"@wordpress/default"
+	],
+	"plugins": [
+		"add-module-exports"
+	]
 }
