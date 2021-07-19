@@ -19,11 +19,15 @@
 	],
 	"license": "ISC",
 	"devDependencies": {
-		"@babel/core": "^7.12.10",
+		"@babel/core": "^7.14.5",
+		"@babel/preset-env": "^7.14.5",
+		"@babel/register": "^7.14.5",
 		"@commitlint/cli": "^11.0.0",
 		"@commitlint/config-conventional": "^11.0.0",
 		"@wordpress/babel-preset-default": "^4.20.0",
 		"@wordpress/eslint-plugin": "^7.4.0",
+		"babel-plugin-add-module-exports": "^1.0.4",
+		"chromedriver": "*",
 		"commitizen": "^4.2.3",
 		"cz-conventional-changelog": "^3.3.0",
 		"eslint": "^7.18.0",
@@ -32,12 +36,28 @@
 		"eslint-plugin-jsdoc": "^31.0.7",
 		"eslint-plugin-prettier": "^3.3.1",
 		"eslint-plugin-react": "^7.22.0",
+		"geckodriver": "*",
 		"husky": "^5.0.9",
+		"localtunnel": "^2.0.1",
+		"nightwatch": "^1.6.4",
 		"parcel": "^2.0.0-beta.2",
-		"prettier": "npm:wp-prettier@^2.2.1-beta-1"
+		"prettier": "npm:wp-prettier@^2.2.1-beta-1",
+		"selenium-webdriver": "^4.0.0-beta.2"
 	},
 	"resolutions": {
 		"node-forge": "0.10.0"
+	},
+	"peerDependencies": {
+		"chromedriver": "^91.0.1",
+		"geckodriver": "^2.0.0"
+	},
+	"peerDependenciesMeta": {
+		"chromedriver": {
+			"optional": true
+		},
+		"geckodriver": {
+			"optional": true
+		}
 	},
 	"husky": {
 		"hooks": {
