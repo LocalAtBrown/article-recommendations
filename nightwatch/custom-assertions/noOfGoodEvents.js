@@ -47,4 +47,4 @@ function NoOfGoodEvents(expected_value, msg) {
 	};
 }
 
-export const assertion = NoOfGoodEvents;
+module.exports.assertion = NoOfGoodEvents;
