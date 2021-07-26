@@ -6,17 +6,19 @@ const EventEmitter = require('events');
 class ResetMicro extends EventEmitter {
 	async command() {
 		const request = require('request');
-		// const localtunnel = require("localtunnel");
-		// const tunnel = await localtunnel({port: 9090});
+		// const localtunnel = require('localtunnel');
+		// const tunnel = await localtunnel({
+		// 	port: 9090,
+		// 	subdomain: 'lnlmicro',
+		// });
 
 		// const options = {
 		// 	url: `${tunnel.url}/micro/reset`,
 		// 	headers: {
-		// 		"User-Agent": "request",
-		// 		"Bypass-Tunnel-Reminder": "true",
+		// 		'User-Agent': 'request',
+		// 		'Bypass-Tunnel-Reminder': 'true',
 		// 	},
 		// };
-		// console.log(options.url);
 		request('http://localhost:9090/micro/reset', (err, res, body) => {
 			if (err) {
 				console.log(err);
