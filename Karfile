@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+#@build
+#+Build micro, static server, and localtunnel
+task-build() {
+    docker compose up -d
+    npx localtunnel --port 9090 --subdomain lnlmicro --open
+}
+
+#@run
+#+Run command in docker container.
+task-run() {
+    docker run \
+      --mount type=bind,source=$(pwd)/micro/config,destination=/config \
+      -p 9090:9090 \
+      snowplow/snowplow-micro:latest \
+      --collector-config /micro/config/micro.conf \
+      --iglu /micro/config/iglu.json \
+      -it snowplow-micro
+}
+
+
+#@health-check
+#+Ping the scala stream collector on the /health path
+task-health-check() {
+    curl http://0.0.0.0:9090/health
+}
+
+#@good
+#+Query /micro/good for good events with JSON filters
+task-good(){
+    curl -X POST -H 'Content-Type: application/json' http://0.0.0.0:9090/micro/good -d \
+        '{
+            "schema": "iglu:com.washingtoncitypaper/recommendation_flow/jsonschema/1-0-0",
+            "contexts": [
+            "io.localnewslab/article_recommendation/jsonschema/1-0-0",
+            "io.localnewslab/model/jsonschema/1-0-0"
+            ],
+            "limit": 10
+        }'
+}
+
+#@all
+#+Query /micro/all for good events with JSON filters
+task-all(){
+    curl -X GET -H 'Content-Type: application/json' http://0.0.0.0:9090/micro/all
+}
+
+
+#@bad
+#+Query /micro/bad for good events with JSON filters
+task-bad(){
+    curl -X GET -H 'Content-Type: application/json' http://0.0.0.0:9090/micro/bad -d \
+        '{
+            "vendor":"com.washingtoncitypaper",
+            "version":"1-0-0",
+            "limit": 10
+        }'
+}
+
+#@reset
+#+Delete all events from the cache.
+task-reset(){
+    curl -X GET -H 'Content-Type: application/json' http://0.0.0.0:9090/micro/reset
+}
+
+#@cleanup
+#+Shutdown containers and default network
+task-cleanup() {
+    docker compose down
+}
