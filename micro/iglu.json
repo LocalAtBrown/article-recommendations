@@ -6,17 +6,7 @@
 			{
 				"name": "Iglu Central",
 				"priority": 0,
-				"vendorPrefixes": ["com.snowplowanalytics"],
-				"connection": {
-					"http": {
-						"uri": "http://iglucentral.com"
-					}
-				}
-			},
-			{
-				"name": "AMP",
-				"priority": 2,
-				"vendorPrefixes": ["dev.amp.snowplow"],
+				"vendorPrefixes": ["com.snowplowanalytics", "dev.amp.snowplow"],
 				"connection": {
 					"http": {
 						"uri": "http://iglucentral.com"
@@ -26,17 +16,7 @@
 			{
 				"name": "Washington City Paper - Dev",
 				"priority": 9,
-				"vendorPrefixes": ["com.washingtoncitypaper"],
-				"connection": {
-					"http": {
-						"uri": "http://lnl-snowplow-schema-registry-dev.s3-website-us-east-1.amazonaws.com/"
-					}
-				}
-			},
-			{
-				"name": "Local News Lab - Dev",
-				"priority": 10,
-				"vendorPrefixes": ["io.localnewslab"],
+				"vendorPrefixes": ["com.washingtoncitypaper", "io.localnewslab"],
 				"connection": {
 					"http": {
 						"uri": "http://lnl-snowplow-schema-registry-dev.s3-website-us-east-1.amazonaws.com/"
