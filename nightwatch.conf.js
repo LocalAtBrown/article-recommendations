@@ -25,11 +25,6 @@ module.exports = {
 				browserName: 'chrome',
 				chromeOptions: {
 					args: ['--headless'],
-					prefs: {
-						download: {
-							default_directory: require('path').resolve(__dirname + '/download'),
-						},
-					},
 				},
 			},
 			webdriver: {
@@ -57,17 +52,11 @@ module.exports = {
 		},
 
 		prod: {
-			launchUrl:
-				'https://washingtoncitypaper.com/article/517630/contract-of-dc-housing-authority-ed-tyrone-garrett-will-not-be-renewed/#amp-x-canary50=0',
+			launchUrl: 'https://washingtoncitypaper.com/',
 			desiredCapabilities: {
 				browserName: 'chrome',
 				chromeOptions: {
 					args: ['--headless'],
-					prefs: {
-						download: {
-							default_directory: require('path').resolve(__dirname + '/download'),
-						},
-					},
 				},
 			},
 			webdriver: {
