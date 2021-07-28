@@ -30,24 +30,13 @@ module.exports = {
 			webdriver: {
 				start_process: true,
 				port: 4445,
-				server_path: './bin/chromedriver',
+				server_path: 'bin/chromedriver',
 			},
 			globals: {
 				controlUrl:
 					'https://localnewslab.newspackstaging.com/2020/12/07/rutrum-vel-euismod-proin-vulputate-nulla-aliquam/#amp-x-canary=0',
 				recUrl:
 					'https://localnewslab.newspackstaging.com/2020/12/07/rutrum-vel-euismod-proin-vulputate-nulla-aliquam/#amp-x-canary=1',
-			},
-		},
-
-		firefox: {
-			desiredCapabilities: {
-				browserName: 'firefox',
-			},
-			webdriver: {
-				start_process: true,
-				port: 4447,
-				server_path: require('geckodriver').path,
 			},
 		},
 
@@ -61,8 +50,8 @@ module.exports = {
 			},
 			webdriver: {
 				start_process: true,
-				port: 4445,
-				server_path: './bin/chromedriver',
+				port: 4446,
+				server_path: 'bin/chromedriver',
 			},
 			globals: {
 				controlUrl:
