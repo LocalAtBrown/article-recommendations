@@ -12,3 +12,4 @@ node_modules/
 tests/tests_output/
 tests/nightwatch/tests_output/
 tests_output/
+chromedriver.log
