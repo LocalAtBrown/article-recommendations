@@ -32,5 +32,15 @@ services:
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DB_NAME: wordpress
+
+  micro:
+    container_name: micro
+    image: snowplow/snowplow-micro:1.0.0
+    restart: always
+    ports:
+      - '9090:9090'
+    command: '--collector-config /config/micro.conf --iglu /config/iglu.json'
+    volumes:
+      - ./micro:/config
 volumes:
   db_data: {}

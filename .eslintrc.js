@@ -26,5 +26,12 @@ module.exports = {
 		'jsdoc/require-returns': 'off',
 		// PHP vars from backend are in snake case
 		camelcase: 'off',
+		'jsdoc/check-tag-names': [
+			'error',
+			{
+				definedTags: ['api', 'method', 'produces', 'route'],
+				tagNamePreferences: ['method'],
+			},
+		],
 	},
 };

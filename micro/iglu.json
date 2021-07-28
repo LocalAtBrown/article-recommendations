@@ -1,0 +1,28 @@
+{
+	"schema": "iglu:com.snowplowanalytics.iglu/resolver-config/jsonschema/1-0-0",
+	"data": {
+		"cacheSize": 500,
+		"repositories": [
+			{
+				"name": "Iglu Central",
+				"priority": 0,
+				"vendorPrefixes": ["com.snowplowanalytics", "dev.amp.snowplow"],
+				"connection": {
+					"http": {
+						"uri": "http://iglucentral.com"
+					}
+				}
+			},
+			{
+				"name": "Washington City Paper - Dev",
+				"priority": 9,
+				"vendorPrefixes": ["com.washingtoncitypaper", "io.localnewslab"],
+				"connection": {
+					"http": {
+						"uri": "http://lnl-snowplow-schema-registry-dev.s3-website-us-east-1.amazonaws.com/"
+					}
+				}
+			}
+		]
+	}
+}
