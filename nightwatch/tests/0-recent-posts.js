@@ -7,21 +7,24 @@ module.exports = {
 		browser.assert.noOfTotalEvents(0);
 	},
 	tags: ['staging'],
-	'Step 1: Number of good events after user SEES the widget is equal to ONE': function (browser) {
-		browser.url(
-			'https://localnewslab.newspackstaging.com/2020/12/07/rutrum-vel-euismod-proin-vulputate-nulla-aliquam/#amp-x-canary=0'
-		);
+	'Step 1: Number of good events after user SEES the widget is equal to ONE': async function (
+		browser
+	) {
 		const recentPostId = '#recentposts_1';
 		const recentPostsId = '#recentposts';
 
+		await browser.url(`${browser.globals.controlUrl}`);
+
 		// scroll to recommendation widget
-		browser.waitForElementVisible(recentPostsId).moveToElement(recentPostId, 0, 0);
+		await browser.timeoutsImplicitWait(10000);
+		await browser.waitForElementVisible(recentPostsId);
+		await browser.moveToElement(recentPostId, 0, 0);
 
-		browser.assert.noBadEvents();
-		browser.assert.noOfGoodEvents(1);
-		browser.assert.noOfTotalEvents(1);
+		await browser.assert.noBadEvents();
+		await browser.assert.noOfGoodEvents(1);
+		await browser.assert.noOfTotalEvents(1);
 
-		browser.assert.successfulEvent(
+		await browser.assert.successfulEvent(
 			{
 				eventType: 'unstruct',
 				schema: 'iglu:com.washingtoncitypaper/recommendation_flow/jsonschema/1-0-0',
@@ -68,14 +71,13 @@ module.exports = {
 	'Step 2: Number of good events after user CLICKS a RECENT POST is equal to TWO': async function (
 		browser
 	) {
-		browser.url(
-			'https://localnewslab.newspackstaging.com/2020/12/07/rutrum-vel-euismod-proin-vulputate-nulla-aliquam/#amp-x-canary=0'
-		);
+		await browser.url(`${browser.globals.controlUrl}`);
 
 		const recentPostId = '#recentposts_1';
 		const recentPostsId = '#recentposts';
 
 		// scroll to recommendation widget
+		await browser.timeoutsImplicitWait(10000);
 		await browser.waitForElementVisible(recentPostsId);
 		await browser.moveToElement(recentPostId, 0, 0);
 
@@ -89,7 +91,6 @@ module.exports = {
 				schema: 'iglu:com.washingtoncitypaper/recommendation_flow/jsonschema/1-0-0',
 				values: {
 					step_name: 'widget_seen',
-					//article_ids: articleIds,
 				},
 				contexts: [
 					{
@@ -128,63 +129,59 @@ module.exports = {
 			'Testing micro received the expected "widget_seen" event with recent_post, articles, and experiment context'
 		);
 
-		await browser.click(recentPostId, async function (result) {
-			await this.assert.equal(true, result.status === 0, 'Article clicked successfully');
+		browser.click(recentPostId, function (result) {
+			this.assert.equal(true, result.status === 0, 'Article clicked successfully');
 		});
 
-		const { value } = await browser.getAttribute(recentPostsId, 'data-vars-one');
-		const articleId = parseInt(value);
+		const articleId = browser.getAttribute(recentPostsId, 'data-vars-one', function (result) {
+			// convert articleId to int
+			const articleId = parseInt(result.value);
 
-		await browser.assert.noBadEvents();
-		await browser.assert.noOfGoodEvents(2);
-		await browser.assert.noOfTotalEvents(2);
+			browser.assert.noBadEvents();
+			browser.assert.noOfGoodEvents(2);
+			browser.assert.noOfTotalEvents(2);
 
-		await browser.assert.successfulEvent(
-			{
-				eventType: 'unstruct',
-				schema: 'iglu:com.washingtoncitypaper/recommendation_flow/jsonschema/1-0-0',
-				values: {
-					step_name: 'widget_click',
+			browser.assert.successfulEvent(
+				{
+					eventType: 'unstruct',
+					schema: 'iglu:com.washingtoncitypaper/recommendation_flow/jsonschema/1-0-0',
+					values: {
+						step_name: 'widget_click',
+					},
+					contexts: [
+						{
+							schema: 'iglu:dev.amp.snowplow/amp_id/jsonschema/1-0-0',
+						},
+						{
+							schema: 'iglu:io.localnewslab/model/jsonschema/1-0-0',
+							data: {
+								type: 'recent_posts',
+							},
+						},
+						{
+							schema: 'iglu:io.localnewslab/experiment/jsonschema/1-0-0',
+						},
+						{
+							schema: 'iglu:com.washingtoncitypaper/article/jsonschema/1-0-0',
+							data: {
+								id: articleId,
+							},
+						},
+						{
+							schema: 'iglu:io.localnewslab/article_recommendation/jsonschema/1-0-0',
+							data: {
+								position: 1,
+								articleId,
+							},
+						},
+						{
+							schema: 'iglu:dev.amp.snowplow/amp_web_page/jsonschema/1-0-0',
+						},
+					],
 				},
-				contexts: [
-					{
-						schema: 'iglu:dev.amp.snowplow/amp_id/jsonschema/1-0-0',
-					},
-					{
-						schema: 'iglu:io.localnewslab/model/jsonschema/1-0-0',
-						data: {
-							type: 'recent_posts',
-						},
-					},
-					{
-						schema: 'iglu:io.localnewslab/experiment/jsonschema/1-0-0',
-					},
-					{
-						schema: 'iglu:com.washingtoncitypaper/article/jsonschema/1-0-0',
-						data: {
-							id: articleId,
-						},
-					},
-					{
-						schema: 'iglu:io.localnewslab/article_recommendation/jsonschema/1-0-0',
-						data: {
-							position: 1,
-							articleId,
-						},
-					},
-					{
-						schema: 'iglu:dev.amp.snowplow/amp_web_page/jsonschema/1-0-0',
-					},
-				],
-			},
-			1,
-			'Testing micro received the expected "widget_click" event with recent_post, articles, and experiment context'
-		);
-		// Event with property test - context, event type, and schema properties
-		// Race condition test - ensure that event x is always sent to micro before event y
+				1,
+				'Testing micro received the expected "widget_click" event with recent_post, articles, and experiment context'
+			);
+		});
 	},
-	// "Recent Posts widget should be loaded": function (browser) {},
-	// "Check the order of events; widget seen always before widget click": function (browser) {},
-	// "Number of good events after SELECTION of post is equal to one": function (browser) {},
-	// "Number of good events after BROWSE to landing page is equal to one": function (browser) {},
 };
