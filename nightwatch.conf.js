@@ -37,6 +37,12 @@ module.exports = {
 				port: 4445,
 				server_path: './bin/chromedriver',
 			},
+			globals: {
+				controlUrl:
+					'https://localnewslab.newspackstaging.com/2020/12/07/rutrum-vel-euismod-proin-vulputate-nulla-aliquam/#amp-x-canary=0',
+				recUrl:
+					'https://localnewslab.newspackstaging.com/2020/12/07/rutrum-vel-euismod-proin-vulputate-nulla-aliquam/#amp-x-canary=1',
+			},
 		},
 
 		firefox: {
@@ -47,6 +53,33 @@ module.exports = {
 				start_process: true,
 				port: 4447,
 				server_path: require('geckodriver').path,
+			},
+		},
+
+		prod: {
+			launchUrl:
+				'https://washingtoncitypaper.com/article/517630/contract-of-dc-housing-authority-ed-tyrone-garrett-will-not-be-renewed/#amp-x-canary50=0',
+			desiredCapabilities: {
+				browserName: 'chrome',
+				chromeOptions: {
+					args: ['--headless'],
+					prefs: {
+						download: {
+							default_directory: require('path').resolve(__dirname + '/download'),
+						},
+					},
+				},
+			},
+			webdriver: {
+				start_process: true,
+				port: 4445,
+				server_path: './bin/chromedriver',
+			},
+			globals: {
+				controlUrl:
+					'https://washingtoncitypaper.com/article/517630/contract-of-dc-housing-authority-ed-tyrone-garrett-will-not-be-renewed/#amp-x-canary50=0',
+				recUrl:
+					'https://washingtoncitypaper.com/article/517630/contract-of-dc-housing-authority-ed-tyrone-garrett-will-not-be-renewed/#amp-x-canary50=1',
 			},
 		},
 	},
