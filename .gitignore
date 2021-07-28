@@ -1,6 +1,14 @@
-node_modules
 dist
 .cache
 article-recommendations.zip
 .parcel-cache
 *.js.map
+
+
+# Node
+node_modules/
+
+# Nightwatch in tests dir
+tests/tests_output/
+tests/nightwatch/tests_output/
+tests_output/
